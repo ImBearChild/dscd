@@ -1,0 +1,19 @@
+{
+  "name": "dscd",
+  "version": "0.1.0",
+  "description": "Deadly Simple Clash Dashboard — a single-file, zero-dependency dashboard for clash-meta",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "node build.js",
+    "dev": "node build.js --watch && npx serve dist"
+  },
+  "dependencies": {
+    "vanjs-core": "^1.6.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  }
+}
