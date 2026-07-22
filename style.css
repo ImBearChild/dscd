@@ -299,45 +299,63 @@ body {
   display: none;
 }
 
-.proxy-node {
+/* ---------- Node Rows ---------- */
+.node-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 5px 14px 5px 28px;
+}
+
+.node-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.node-row.selectable {
   cursor: pointer;
   transition: background 0.1s;
 }
 
-.proxy-node:hover {
+.node-row.selectable:hover {
   background: rgba(255, 255, 255, 0.03);
 }
 
-.proxy-node.selected {
+.node-row.selected {
   background: rgba(233, 69, 96, 0.08);
 }
 
-.proxy-node-indicator {
+.node-indicator {
   font-size: 10px;
   width: 14px;
   text-align: center;
   flex-shrink: 0;
 }
 
-.proxy-node.selected .proxy-node-indicator {
+.node-row.selected .node-indicator {
   color: var(--accent);
 }
 
-.proxy-node-name {
+.node-name {
   flex: 1;
   color: var(--text);
 }
 
-.proxy-node.selected .proxy-node-name {
+.node-row.selected .node-name {
   color: var(--accent);
   font-weight: 500;
 }
 
-.proxy-node-delay {
+.node-type {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  min-width: 28px;
+  text-align: center;
+}
+
+.node-delay {
   font-family: var(--font-mono);
   font-size: 11px;
   min-width: 56px;
@@ -347,23 +365,113 @@ body {
   background: rgba(255, 255, 255, 0.04);
 }
 
-.proxy-node-delay.fast {
+.node-delay.fast {
   color: var(--green);
   background: rgba(78, 204, 163, 0.1);
 }
 
-.proxy-node-delay.medium {
+.node-delay.medium {
   color: var(--yellow);
   background: rgba(240, 192, 64, 0.1);
 }
 
-.proxy-node-delay.slow {
+.node-delay.slow {
   color: var(--orange);
   background: rgba(249, 115, 22, 0.1);
 }
 
-.proxy-node-delay.timeout {
+.node-delay.timeout {
   color: var(--muted);
+}
+
+/* ---------- Provider List ---------- */
+.provider-card {
+  border-bottom: 1px solid var(--border);
+}
+
+.provider-card:last-child {
+  border-bottom: none;
+}
+
+.provider-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+}
+
+.provider-name {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.provider-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(233, 69, 96, 0.15);
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.provider-spacer {
+  flex: 1;
+}
+
+.provider-meta {
+  padding: 2px 14px 8px;
+}
+
+.provider-meta-row {
+  display: flex;
+  gap: 10px;
+  padding: 2px 0;
+  font-size: 12px;
+}
+
+.provider-meta-label {
+  color: var(--muted);
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.provider-meta-value {
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.provider-nodes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.provider-nodes-toggle:hover {
+  color: var(--text);
+}
+
+.provider-nodes-arrow {
+  font-size: 10px;
+  color: var(--muted);
+  transition: transform 0.15s;
+  transform: rotate(-90deg);
+}
+
+.provider-nodes-arrow.open {
+  transform: rotate(0deg);
+}
+
+.provider-nodes {
+  display: none;
+}
+
+.provider-nodes.open {
+  display: block;
 }
 
 /* ---------- Connection Table ---------- */

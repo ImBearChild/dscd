@@ -10,6 +10,24 @@ export interface ProxyInfo {
   udp?: boolean;
 }
 
+export interface SubscriptionInfo {
+  Upload?: number;
+  Download?: number;
+  Total?: number;
+  Expire?: number;
+}
+
+export interface ProviderInfo {
+  name: string;
+  type: string;
+  vehicleType: string;
+  proxies: ProxyInfo[];
+  testUrl: string;
+  expectedStatus: string;
+  updatedAt?: string;
+  subscriptionInfo?: SubscriptionInfo;
+}
+
 export interface Connection {
   id: string;
   metadata: {
@@ -92,6 +110,7 @@ export const connecting = van.state(false);
 export const connectionError = van.state("");
 
 export const proxies = van.state<Record<string, ProxyInfo>>({});
+export const providers = van.state<Record<string, ProviderInfo>>({});
 export const traffic = van.state<Traffic>({ up: 0, down: 0 });
 export const connections = van.state<Connection[]>([]);
 export const logs = van.state<LogEntry[]>([]);
@@ -99,11 +118,11 @@ export const logLevel = van.state("info");
 
 export const autoConnect = van.state(hasURLParams || !!(localStorage.getItem("clash-api-url")));
 
-export type TabId = "proxies" | "connections" | "logs";
+export type TabId = "proxies" | "connections" | "logs" | "providers";
 
 function readHash(): TabId {
   const h = location.hash.replace(/^#/, "");
-  if (h === "connections" || h === "logs") return h;
+  if (h === "connections" || h === "logs" || h === "providers") return h;
   return "proxies";
 }
 

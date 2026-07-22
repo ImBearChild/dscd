@@ -1,14 +1,14 @@
 import van from "vanjs-core";
 import { proxies, connected, showToast } from "../state";
 import { get, put } from "../api";
+import { DEFAULT_TEST_URL, proxyTypeLabel } from "../utils";
+import { NodeRow } from "./nodeRow";
 
 const { div, span, button } = van.tags;
 
 interface DelayMap {
   [name: string]: number;
 }
-
-const DEFAULT_TEST_URL = "http://www.gstatic.com/generate_204";
 
 export function ProxyList() {
   const delay = van.state<DelayMap>({});
@@ -43,18 +43,6 @@ export function ProxyList() {
     } catch (e: any) {
       showToast(`Switch failed: ${e.message}`, "error");
     }
-  }
-
-  function delayClass(ms: number): string {
-    if (ms < 0) return "timeout";
-    if (ms < 200) return "fast";
-    if (ms < 400) return "medium";
-    return "slow";
-  }
-
-  function delayText(ms: number): string {
-    if (ms < 0) return "Timeout";
-    return `${ms}ms`;
   }
 
   async function testDelay(proxyName: string) {
@@ -153,39 +141,20 @@ export function ProxyList() {
             ),
             div(
               { class: () => `proxy-nodes ${collapsed.val[name] ? "collapsed" : ""}` },
-              ...(info.all || []).map((nodeName: string) => {
-                const isCurrent = nodeName === info.now;
-                return div(
-                  {
-                    class: () => `proxy-node ${isCurrent ? "selected" : ""}`,
-                    onclick: () => switchProxy(name, nodeName),
+              ...(info.all || []).map((nodeName: string) =>
+                NodeRow({
+                  name: nodeName,
+                  type: proxyTypeLabel(proxies.val[nodeName]?.type),
+                  delaySource: {
+                    delay: () => delay.val[nodeName] ?? -2,
+                    testing: () => testing.val[nodeName],
+                    onTest: () => testDelay(nodeName),
                   },
-                  span(
-                    { class: "proxy-node-indicator" },
-                    isCurrent ? "●" : "○"
-                  ),
-                  span({ class: "proxy-node-name" }, nodeName),
-                  span(
-                    { class: () => `proxy-node-delay ${delayClass(delay.val[nodeName] ?? -2)}` },
-                    () => {
-                      const d = delay.val[nodeName];
-                      if (d === undefined) return "";
-                      return delayText(d);
-                    }
-                  ),
-                  button(
-                    {
-                      class: "btn btn-sm",
-                      onclick: (e: Event) => {
-                        e.stopPropagation();
-                        testDelay(nodeName);
-                      },
-                      disabled: () => testing.val[nodeName],
-                    },
-                    () => testing.val[nodeName] ? "..." : "Test"
-                  )
-                );
-              })
+                  selectable: "y",
+                  isCurrent: nodeName === info.now,
+                  onClick: () => switchProxy(name, nodeName),
+                })
+              )
             )
           );
         })

@@ -6,6 +6,7 @@ import { TopBar } from "./components/topBar";
 import { ProxyList } from "./components/proxyList";
 import { ConnectionTable } from "./components/connectionTable";
 import { LogPanel } from "./components/logPanel";
+import { ProviderList } from "./components/providerList";
 
 const { div, span } = van.tags;
 
@@ -35,6 +36,7 @@ function ToastContainer() {
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "proxies", label: "Proxies" },
+  { id: "providers", label: "Providers" },
   { id: "connections", label: "Connections" },
   { id: "logs", label: "Logs" },
 ];
@@ -68,6 +70,10 @@ function MainDashboard() {
     div(
       { class: () => `tab-panel ${activeTab.val === "proxies" ? "tab-panel-active" : ""}` },
       ProxyList()
+    ),
+    div(
+      { class: () => `tab-panel ${activeTab.val === "providers" ? "tab-panel-active" : ""}` },
+      ProviderList()
     ),
     div(
       { class: () => `tab-panel ${activeTab.val === "connections" ? "tab-panel-active" : ""}` },
