@@ -2,16 +2,19 @@ import van from "vanjs-core";
 import { proxies, connected, showToast } from "../state";
 import { get, put } from "../api";
 
-const { div, span, select, option, button } = van.tags;
+const { div, span, button } = van.tags;
 
 interface DelayMap {
   [name: string]: number;
 }
 
+const DEFAULT_TEST_URL = "http://www.gstatic.com/generate_204";
+
 export function ProxyList() {
-  const baseDelayUrl = "http://www.gstatic.com/generate_204";
   const delay = van.state<DelayMap>({});
   const testing = van.state<Record<string, boolean>>({});
+  const groupTesting = van.state<Record<string, boolean>>({});
+  const collapsed = van.state<Record<string, boolean>>({});
 
   van.derive(() => {
     if (connected.val) {
@@ -42,17 +45,29 @@ export function ProxyList() {
     }
   }
 
+  function delayClass(ms: number): string {
+    if (ms < 0) return "timeout";
+    if (ms < 200) return "fast";
+    if (ms < 400) return "medium";
+    return "slow";
+  }
+
+  function delayText(ms: number): string {
+    if (ms < 0) return "Timeout";
+    return `${ms}ms`;
+  }
+
   async function testDelay(proxyName: string) {
     const t = { ...testing.val };
     t[proxyName] = true;
     testing.val = t;
 
     try {
-      const start = performance.now();
-      await get(`/proxies/${encodeURIComponent(proxyName)}/delay?url=${encodeURIComponent(baseDelayUrl)}&timeout=5000`);
-      const elapsed = Math.round(performance.now() - start);
+      const data = await get<{ delay: number }>(
+        `/proxies/${encodeURIComponent(proxyName)}/delay?url=${encodeURIComponent(DEFAULT_TEST_URL)}&timeout=5000`
+      );
       const d = { ...delay.val };
-      d[proxyName] = elapsed;
+      d[proxyName] = data.delay > 0 ? data.delay : -1;
       delay.val = d;
     } catch {
       const d = { ...delay.val };
@@ -65,8 +80,39 @@ export function ProxyList() {
     }
   }
 
+  async function testGroupDelay(groupName: string, testUrl?: string) {
+    const gt = { ...groupTesting.val };
+    gt[groupName] = true;
+    groupTesting.val = gt;
+
+    const url = testUrl || DEFAULT_TEST_URL;
+
+    try {
+      const data = await get<Record<string, number>>(
+        `/group/${encodeURIComponent(groupName)}/delay?url=${encodeURIComponent(url)}&timeout=5000`
+      );
+      const d = { ...delay.val };
+      for (const [name, ms] of Object.entries(data)) {
+        d[name] = ms > 0 ? ms : -1;
+      }
+      delay.val = d;
+    } catch {
+      showToast(`Group test failed for ${groupName}`, "error");
+    } finally {
+      const gt2 = { ...groupTesting.val };
+      gt2[groupName] = false;
+      groupTesting.val = gt2;
+    }
+  }
+
   function isProxyGroup(info: any): boolean {
     return info.type === "Selector" || info.type === "URLTest" || info.type === "Fallback";
+  }
+
+  function toggleCollapse(groupName: string) {
+    const c = { ...collapsed.val };
+    c[groupName] = !c[groupName];
+    collapsed.val = c;
   }
 
   return div(
@@ -85,37 +131,61 @@ export function ProxyList() {
           return div(
             { class: "proxy-group" },
             div(
-              { class: "proxy-group-header" },
+              {
+                class: () => `proxy-group-header ${collapsed.val[name] ? "collapsed" : ""}`,
+                onclick: () => toggleCollapse(name),
+              },
               span({ class: "proxy-group-name" }, name),
-              select(
-                {
-                  class: "proxy-select",
-                  onchange: (e: Event) => {
-                    const target = e.target as HTMLSelectElement;
-                    switchProxy(name, target.value);
-                  },
-                },
-                (info.all || []).map((n: string) =>
-                  option({ value: n, selected: n === info.now }, n)
-                )
-              ),
-              span(
-                { class: "proxy-delay" },
-                () => {
-                  const d = delay.val[info.now || ""];
-                  if (d === undefined) return "";
-                  if (d === -1) return "Timeout";
-                  return `${d}ms`;
-                }
-              ),
+              span({ class: "proxy-group-now" }, info.now || ""),
+              div({ class: "proxy-group-spacer" }),
               button(
                 {
                   class: "btn btn-sm",
-                  onclick: () => testDelay(info.now || ""),
-                  disabled: () => testing.val[info.now || ""] || !info.now,
+                  onclick: (e: Event) => {
+                    e.stopPropagation();
+                    testGroupDelay(name, info.testUrl);
+                  },
+                  disabled: () => groupTesting.val[name],
                 },
-                () => testing.val[info.now || ""] ? "Testing..." : "Test"
-              )
+                () => groupTesting.val[name] ? "Testing..." : "Test All"
+              ),
+              span({ class: "proxy-group-arrow" }, "▼")
+            ),
+            div(
+              { class: () => `proxy-nodes ${collapsed.val[name] ? "collapsed" : ""}` },
+              ...(info.all || []).map((nodeName: string) => {
+                const isCurrent = nodeName === info.now;
+                return div(
+                  {
+                    class: () => `proxy-node ${isCurrent ? "selected" : ""}`,
+                    onclick: () => switchProxy(name, nodeName),
+                  },
+                  span(
+                    { class: "proxy-node-indicator" },
+                    isCurrent ? "●" : "○"
+                  ),
+                  span({ class: "proxy-node-name" }, nodeName),
+                  span(
+                    { class: () => `proxy-node-delay ${delayClass(delay.val[nodeName] ?? -2)}` },
+                    () => {
+                      const d = delay.val[nodeName];
+                      if (d === undefined) return "";
+                      return delayText(d);
+                    }
+                  ),
+                  button(
+                    {
+                      class: "btn btn-sm",
+                      onclick: (e: Event) => {
+                        e.stopPropagation();
+                        testDelay(nodeName);
+                      },
+                      disabled: () => testing.val[nodeName],
+                    },
+                    () => testing.val[nodeName] ? "..." : "Test"
+                  )
+                );
+              })
             )
           );
         })

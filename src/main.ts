@@ -1,5 +1,5 @@
 import van from "vanjs-core";
-import { connected, connecting, connectionError, toasts, autoConnect } from "./state";
+import { connected, connecting, connectionError, toasts, autoConnect, activeTab, TabId } from "./state";
 import { checkConnection } from "./api";
 import { ConnectPage } from "./components/connect";
 import { TopBar } from "./components/topBar";
@@ -33,12 +33,50 @@ function ToastContainer() {
   );
 }
 
+const TABS: { id: TabId; label: string }[] = [
+  { id: "proxies", label: "Proxies" },
+  { id: "connections", label: "Connections" },
+  { id: "logs", label: "Logs" },
+];
+
+function TabBar() {
+  return div(
+    { class: "tabs" },
+    ...TABS.map((t) =>
+      div(
+        {
+          class: () => `tab ${activeTab.val === t.id ? "tab-active" : ""}`,
+          onclick: () => {
+            activeTab.val = t.id;
+            if (t.id === "proxies") {
+              history.replaceState(null, "", location.pathname + location.search);
+            } else {
+              location.hash = t.id;
+            }
+          },
+        },
+        t.label
+      )
+    )
+  );
+}
+
 function MainDashboard() {
   return div(
     TopBar(),
-    ProxyList(),
-    ConnectionTable(),
-    LogPanel()
+    TabBar(),
+    div(
+      { class: () => `tab-panel ${activeTab.val === "proxies" ? "tab-panel-active" : ""}` },
+      ProxyList()
+    ),
+    div(
+      { class: () => `tab-panel ${activeTab.val === "connections" ? "tab-panel-active" : ""}` },
+      ConnectionTable()
+    ),
+    div(
+      { class: () => `tab-panel ${activeTab.val === "logs" ? "tab-panel-active" : ""}` },
+      LogPanel()
+    )
   );
 }
 

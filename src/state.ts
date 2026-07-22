@@ -6,6 +6,7 @@ export interface ProxyInfo {
   now?: string;
   all?: string[];
   history?: { time: string; delay: number }[];
+  testUrl?: string;
   udp?: boolean;
 }
 
@@ -97,6 +98,20 @@ export const logs = van.state<LogEntry[]>([]);
 export const logLevel = van.state("info");
 
 export const autoConnect = van.state(hasURLParams || !!(localStorage.getItem("clash-api-url")));
+
+export type TabId = "proxies" | "connections" | "logs";
+
+function readHash(): TabId {
+  const h = location.hash.replace(/^#/, "");
+  if (h === "connections" || h === "logs") return h;
+  return "proxies";
+}
+
+export const activeTab = van.state<TabId>(readHash());
+
+window.addEventListener("hashchange", () => {
+  activeTab.val = readHash();
+});
 
 export interface ToastMessage {
   id: number;
