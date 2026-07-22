@@ -7,6 +7,7 @@ import { ProxyList } from "./components/proxyList";
 import { ConnectionTable } from "./components/connectionTable";
 import { LogPanel } from "./components/logPanel";
 import { ProviderList } from "./components/providerList";
+import { InfoPanel } from "./components/infoPanel";
 
 const { div, span } = van.tags;
 
@@ -39,6 +40,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "providers", label: "Providers" },
   { id: "connections", label: "Connections" },
   { id: "logs", label: "Logs" },
+  { id: "info", label: "Info" },
 ];
 
 function TabBar() {
@@ -82,6 +84,10 @@ function MainDashboard() {
     div(
       { class: () => `tab-panel ${activeTab.val === "logs" ? "tab-panel-active" : ""}` },
       LogPanel()
+    ),
+    div(
+      { class: () => `tab-panel ${activeTab.val === "info" ? "tab-panel-active" : ""}` },
+      InfoPanel()
     )
   );
 }

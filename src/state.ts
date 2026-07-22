@@ -57,6 +57,8 @@ export interface LogEntry {
 export interface Traffic {
   up: number;
   down: number;
+  upTotal: number;
+  downTotal: number;
 }
 
 function parseURLParams() {
@@ -111,18 +113,18 @@ export const connectionError = van.state("");
 
 export const proxies = van.state<Record<string, ProxyInfo>>({});
 export const providers = van.state<Record<string, ProviderInfo>>({});
-export const traffic = van.state<Traffic>({ up: 0, down: 0 });
+export const traffic = van.state<Traffic>({ up: 0, down: 0, upTotal: 0, downTotal: 0 });
 export const connections = van.state<Connection[]>([]);
 export const logs = van.state<LogEntry[]>([]);
 export const logLevel = van.state("info");
 
 export const autoConnect = van.state(hasURLParams || !!(localStorage.getItem("clash-api-url")));
 
-export type TabId = "proxies" | "connections" | "logs" | "providers";
+export type TabId = "proxies" | "connections" | "logs" | "providers" | "info";
 
 function readHash(): TabId {
   const h = location.hash.replace(/^#/, "");
-  if (h === "connections" || h === "logs" || h === "providers") return h;
+  if (h === "connections" || h === "logs" || h === "providers" || h === "info") return h;
   return "proxies";
 }
 

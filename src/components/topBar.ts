@@ -13,8 +13,8 @@ export function TopBar() {
   function startTrafficMonitor() {
     if (wsActive) return;
     wsActive = true;
-    const socket = ws("/traffic", (data: { up: number; down: number }) => {
-      traffic.val = { up: data.up - prevUp, down: data.down - prevDown };
+    const socket = ws("/traffic", (data: { up: number; down: number; upTotal?: number; downTotal?: number }) => {
+      traffic.val = { up: data.up - prevUp, down: data.down - prevDown, upTotal: data.upTotal ?? 0, downTotal: data.downTotal ?? 0 };
       prevUp = data.up;
       prevDown = data.down;
     });
