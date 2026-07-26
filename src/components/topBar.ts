@@ -28,8 +28,8 @@ export function TopBar() {
         requestAnimationFrame(() => {
           rafPending = false;
           traffic.val = {
-            up: latestUp - prevUp,
-            down: latestDown - prevDown,
+            up: Math.max(0, latestUp - prevUp),
+            down: Math.max(0, latestDown - prevDown),
             upTotal: latestUpTotal,
             downTotal: latestDownTotal,
           };
