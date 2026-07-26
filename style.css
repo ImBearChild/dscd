@@ -79,7 +79,6 @@ body {
   color: var(--text);
   font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
 }
 
 .form-group input:focus {
@@ -98,17 +97,12 @@ body {
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
   outline: none;
 }
 
 .btn:hover {
   background: #1a4a80;
   border-color: var(--accent);
-}
-
-.btn:active {
-  transform: scale(0.97);
 }
 
 .btn-accent {
@@ -194,7 +188,6 @@ body {
   color: var(--muted);
   cursor: pointer;
   font-size: 13px;
-  transition: background 0.15s, color 0.15s;
 }
 
 .tab:hover {
@@ -206,33 +199,17 @@ body {
   color: var(--accent);
 }
 
-.tab-panel {
-  display: none;
-}
-
-.tab-panel-active {
-  display: block;
-}
-
 /* ---------- Panel ---------- */
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 0 0 var(--radius) var(--radius);
   overflow: hidden;
+  margin-bottom: 12px;
 }
 
 .panel:only-child {
   border-radius: var(--radius);
-}
-
-.tab-panel {
-  display: none;
-  margin-bottom: 12px;
-}
-
-.tab-panel-active {
-  display: block;
 }
 
 .panel-header {
@@ -284,7 +261,6 @@ body {
 .proxy-group-arrow {
   font-size: 10px;
   color: var(--muted);
-  transition: transform 0.15s;
 }
 
 .proxy-group-header.collapsed .proxy-group-arrow {
@@ -313,7 +289,6 @@ body {
 
 .node-row.selectable {
   cursor: pointer;
-  transition: background 0.1s;
 }
 
 .node-row.selectable:hover {
@@ -458,8 +433,6 @@ body {
 .provider-nodes-arrow {
   font-size: 10px;
   color: var(--muted);
-  transition: transform 0.15s;
-  transform: rotate(-90deg);
 }
 
 .provider-nodes-arrow.open {
@@ -605,7 +578,6 @@ body {
   font-size: 13px;
   min-width: 200px;
   max-width: 360px;
-  animation: toastIn 0.3s ease;
 }
 
 .toast.toast-error {
@@ -614,11 +586,6 @@ body {
 
 .toast.toast-success {
   border-left-color: var(--green);
-}
-
-@keyframes toastIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------- Error ---------- */
@@ -653,11 +620,6 @@ body {
   border: 2px solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 .empty-state {

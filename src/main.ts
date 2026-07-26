@@ -69,26 +69,16 @@ function MainDashboard() {
   return div(
     TopBar(),
     TabBar(),
-    div(
-      { class: () => `tab-panel ${activeTab.val === "proxies" ? "tab-panel-active" : ""}` },
-      ProxyList()
-    ),
-    div(
-      { class: () => `tab-panel ${activeTab.val === "providers" ? "tab-panel-active" : ""}` },
-      ProviderList()
-    ),
-    div(
-      { class: () => `tab-panel ${activeTab.val === "connections" ? "tab-panel-active" : ""}` },
-      ConnectionTable()
-    ),
-    div(
-      { class: () => `tab-panel ${activeTab.val === "logs" ? "tab-panel-active" : ""}` },
-      LogPanel()
-    ),
-    div(
-      { class: () => `tab-panel ${activeTab.val === "info" ? "tab-panel-active" : ""}` },
-      InfoPanel()
-    )
+    () => {
+      switch (activeTab.val) {
+        case "proxies": return ProxyList();
+        case "providers": return ProviderList();
+        case "connections": return ConnectionTable();
+        case "logs": return LogPanel();
+        case "info": return InfoPanel();
+        default: return null;
+      }
+    }
   );
 }
 

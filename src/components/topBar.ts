@@ -7,6 +7,11 @@ const { div, span } = van.tags;
 export function TopBar() {
   let prevUp = 0;
   let prevDown = 0;
+  let rafPending = false;
+  let latestUp = 0;
+  let latestDown = 0;
+  let latestUpTotal = 0;
+  let latestDownTotal = 0;
   let wsActive = false;
   let closeWs: (() => void) | null = null;
 
@@ -14,9 +19,24 @@ export function TopBar() {
     if (wsActive) return;
     wsActive = true;
     const socket = ws("/traffic", (data: { up: number; down: number; upTotal?: number; downTotal?: number }) => {
-      traffic.val = { up: data.up - prevUp, down: data.down - prevDown, upTotal: data.upTotal ?? 0, downTotal: data.downTotal ?? 0 };
-      prevUp = data.up;
-      prevDown = data.down;
+      latestUp = data.up;
+      latestDown = data.down;
+      latestUpTotal = data.upTotal ?? 0;
+      latestDownTotal = data.downTotal ?? 0;
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          rafPending = false;
+          traffic.val = {
+            up: latestUp - prevUp,
+            down: latestDown - prevDown,
+            upTotal: latestUpTotal,
+            downTotal: latestDownTotal,
+          };
+          prevUp = latestUp;
+          prevDown = latestDown;
+        });
+      }
     });
     closeWs = () => { socket.close(); };
   }
